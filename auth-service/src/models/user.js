@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "driver", "admin"],
       required: true,
     },
+    isDriverDetailsFilled: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

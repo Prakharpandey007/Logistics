@@ -3,7 +3,7 @@ import { signup, login, GetCachedLogin } from "../services/authService.js";
 // Signup
 export const signupController = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password,role } = req.body;
     const result = await signup(name, email, password, role);
     return res.status(200).json({
       success: true,
@@ -26,11 +26,19 @@ export const signupController = async (req, res) => {
 export const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const result = await login(email, password);
+    const {token,role,user} = await login(email, password);
+    if (role === "driver" && !user.isDriverDetailsFilled) {
+      return res.status(200).json({
+        success: true,
+        message: "Driver must fill details",
+        data: { token },
+        isDriverDetailsFilled: false,
+      });
+    }
     return res.status(200).json({
       success: true,
       message: "Successfully logged in",
-      data: result,
+      data: {token,role,user},
       err: {},
     });
   } catch (error) {

@@ -30,6 +30,7 @@ export const signup = async (name, email, password, role) => {
 
     return {
       message: "user registered successfully",
+      user,
       token,
       role: user.role,
     };
@@ -59,7 +60,9 @@ export const signup = async (name, email, password, role) => {
     if (cachedtoken) {
       return {
         token: cachedtoken,
+        user,
         role: user.role,
+
         message: "Loged in using cachetoken",
       };
     }
@@ -77,6 +80,7 @@ export const signup = async (name, email, password, role) => {
     return {
       token,
       role: user.role,
+      user,
       message: "Logged in successfully",
     };
   } catch (error) {

@@ -6,41 +6,51 @@ const driverDetailsSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  vehcileOwnerName: {
+  vehicleOwnerName: {
     type: String,
     required: true,
+    trim:true,
   },
-  vehcileNumber: {
+  vehicleNumber: {
     type: String,
     required: true,
     match: /^[A-Z]{2}-\d{2}\s[A-Z]{1,2}-\d{4}$/,
     unique: true,
+    trim:true,
+   
   },
+
   driverName: {
     type: String,
     required: true,
+    trim:true,
   },
   driverPhoneNumber: {
     type: String,
     required: true,
     unique: true,
     match: /^[7-9]\d{9}$/,
+    trim:true,
   },
   driverLicenseNumber: {
     type: String,
     required: true,
-    match: /^[A-Z]{2}\d{2}-\d{11,13}$/,
+    match: /^[A-Z]{2}\d{2}-\d{10,13}$/,
     unique: true,
+    trim:true,
+    sparse:true,
   },
   vehicleType: {
     type: String,
-    enum: ["LMV", "HMV", "Commercial", "International", "Permanent"],
+    enum: [ "Pickup vans", "Mini Trucks", "Trucks", "Container Trucks"],
     required: true,
+    trim:true,
   },
   travelPermit: {
      type: String, 
      enum: ["Zonal", "State", "All India"], 
-     required: true
+     required: true,
+     trim:true,
      },
 });
 const Driverdetails = mongoose.model("DriverDetails", driverDetailsSchema);

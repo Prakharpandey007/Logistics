@@ -31,8 +31,11 @@ export const loginController = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Driver must fill details",
-        data: { token },
-        isDriverDetailsFilled: false,
+        data: {
+          token,
+          role,
+          user: { ...user, isDriverDetailsFilled: false }
+        }
       });
     }
     return res.status(200).json({

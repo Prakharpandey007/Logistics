@@ -1,35 +1,36 @@
-import { isAxiosError } from "axios";
+
 import { fillDriverDetails,sendOtp,verifyOtp,isOtpVerified } from "../services/driverService.js"
+// import DriverDetails from "../models/driverDetails.js"; 
 
-export const sendOtpController=async(req,res)=>{
+export const sendOtpController = async (req, res) => {
   try {
-    const {driverPhoneNumber}=req.body;
-    if(!driverPhoneNumber){
+    console.log("Request body:", req.body); // Log incoming request
+    const { driverPhoneNumber } = req.body;
+    if (!driverPhoneNumber) {
       return res.status(400).json({
-        success:false,
-        message:"Phone number is required",
-        data:{},
-        err:{},
-
+        success: false,
+        message: "Phone number is required",
+        data: {},
+        err: {},
       });
     }
-    const response=await sendOtp(driverPhoneNumber);
+    const response = await sendOtp(driverPhoneNumber);
     return res.status(200).json({
-      success:true,
-      message:"Otp send successfully to your Mobile number",
-      data:response,
-      err:{},
-    })
-
+      success: true,
+      message: "OTP sent successfully to your mobile number",
+      data: response,
+      err: {},
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error in sendOtpController:", error);
     return res.status(500).json({
       message: "Something went wrong in sendOtpController",
       success: false,
       err: error,
     });
   }
-}
+};
+
 export const verifyOtpContrller=async(req,res)=>{
   try {
     const {driverPhoneNumber,otp}=req.body;
@@ -71,8 +72,18 @@ export const fillDriverDetailsController = async (req, res) => {
   try {
     const userId = req.user.id;
     const details = req.body;
-    const driverPhoneNumber = details.driverPhoneNumber;
+    if (!details.vehicleNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Vehicle number is required",
+        data: {},
+        err: {},
+      });
+    }
 
+    const driverPhoneNumber = details.driverPhoneNumber;
+    const vehicleNumber=details.vehicleNumber;
+    console.log("Vehcile number is ",vehicleNumber);
     console.log("Phone number:", driverPhoneNumber);
 
     // Check if OTP is verified for this phone number

@@ -8,21 +8,43 @@ const Login = () => {
   const { handleLogin } = useLogin();
   const navigate = useNavigate();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const user = await handleLogin(credentials);
+//   const onSubmit = async (e) => {
+//   e.preventDefault();
+//   try {
+//     const user = await handleLogin({ ...credentials, role });
 
-      if (role === "driver" && !user.isDriverDetailsFilled) {
-        navigate("/driver/details");
-      } else {
-        navigate(`/home/${role}`);
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      alert("Login failed. Please check your credentials and try again.");
+//     if (role === "driver" && !user.isDriverDetailsFilled) {
+//       navigate("/driver/details");
+//     } else {
+//       navigate(`/home/${role}`);
+//     }
+//   } catch (error) {
+//     console.error("Error during login:", error);
+//     alert(error.message || "Login failed. Please check your credentials and try again.");
+//   }
+// };
+const onSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // Ensure you're passing only the values and not the input elements themselves
+    const { email, password } = credentials;
+
+    // Pass only the necessary data to handleLogin
+    const user = await handleLogin({ email, password, role });
+
+    if (role === "driver" && !user.isDriverDetailsFilled) {
+      navigate("/driver/details");
+    } else {
+      navigate(`/home/${role}`);
     }
-  };
+  } catch (error) {
+    console.error("Error during login:", error);
+    alert(error.message || "Login failed. Please check your credentials and try again.");
+  }
+};
+
+
 
   return (
     <div

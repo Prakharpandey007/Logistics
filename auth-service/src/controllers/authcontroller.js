@@ -25,9 +25,10 @@ export const signupController = async (req, res) => {
 // Login
 export const loginController = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const {token,role,user} = await login(email, password);
-    if (role === "driver" && !user.isDriverDetailsFilled) {
+    const { email, password,role } = req.body;
+    // const { email, password } = req.body;
+    const {token,role:userRole,user} = await login(email, password,role);
+    if (userRole === "driver" && !user.isDriverDetailsFilled) {
       return res.status(200).json({
         success: true,
         message: "Driver must fill details",

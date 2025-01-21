@@ -8,11 +8,30 @@ const Signup = () => {
   const { handleSignup } = useSignup();
   const navigate = useNavigate();
 
+  // const onSubmit = async (e) => {
+  //   e.preventDefault();
+  //   await handleSignup({ ...credentials, role });
+  //   navigate(`/login/${role}`);
+  // };
   const onSubmit = async (e) => {
     e.preventDefault();
-    await handleSignup({ ...credentials, role });
-    navigate(`/login/${role}`);
+    console.log("Credentials being sent:", credentials);  // Log credentials
+  
+    try {
+      const { name, email, password } = credentials;  // Extract values (including name for signup)
+  
+      // Call the handleSignup function instead of handleLogin
+      await handleSignup({ name, email, password, role });
+  
+      // After successful signup, navigate to the login page
+      navigate(`/login/${role}`);
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert(error.message || "Signup failed. Please try again.");
+    }
   };
+  
+  
 
   return (
     <div

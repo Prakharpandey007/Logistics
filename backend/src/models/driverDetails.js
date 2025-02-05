@@ -42,7 +42,7 @@ const driverDetailsSchema = new mongoose.Schema({
   },
   vehicleType: {
     type: String,
-    enum: [ "Pickup vans", "Mini Trucks", "Trucks", "Container Trucks"],
+    enum: [ "Pickupvans", "MiniTrucks", "Trucks", "ContainerTrucks"],
     required: true,
     trim:true,
   },

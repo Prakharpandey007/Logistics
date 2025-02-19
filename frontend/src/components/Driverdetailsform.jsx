@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const DriverDetailsForm = () => {
   const [details, setDetails] = useState({
@@ -16,22 +16,48 @@ const DriverDetailsForm = () => {
 
   const [otpSent, setOtpSent] = useState(false);
   const [token, setToken] = useState(null);
-  const navigate = useNavigate(); // ✅ Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const authToken = localStorage.getItem("authToken");
-    if (!authToken) {
+    const storedToken = localStorage.getItem("token"); // ✅ Use correct key
+    if (!storedToken) {
       alert("Session expired. Please login again.");
+      navigate("/driver/login");
       return;
     }
-    setToken(authToken);
-  }, []);
+
+    setToken(storedToken);
+
+    // Fetch driver details
+    const fetchDriverDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/driver/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          }
+        );
+
+        const driverData = response.data?.data?.driver;
+        if (driverData?.isDriverDetailsFilled) {
+          navigate("/home"); // ✅ Redirect if details are already filled
+        }
+      } catch (error) {
+        console.error("Error fetching driver details:", error);
+      }
+    };
+
+    fetchDriverDetails();
+  }, [navigate]);
 
   const sendOtp = async () => {
     try {
-      await axios.post("http://localhost:3000/api/v1/driver/details/sendOtp", {
-        driverPhoneNumber: details.driverPhoneNumber,
-      });
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/driver/details/sendOtp`,
+        { driverPhoneNumber: details.driverPhoneNumber }
+      );
       setOtpSent(true);
     } catch (error) {
       console.error("Error sending OTP:", error.response?.data || error.message);
@@ -41,10 +67,13 @@ const DriverDetailsForm = () => {
 
   const verifyOtp = async () => {
     try {
-      await axios.post("http://localhost:3000/api/v1/driver/details/verifyOtp", {
-        driverPhoneNumber: details.driverPhoneNumber,
-        otp: details.otp,
-      });
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/driver/details/verifyOtp`,
+        {
+          driverPhoneNumber: details.driverPhoneNumber,
+          otp: details.otp,
+        }
+      );
       alert("OTP Verified!");
     } catch (error) {
       console.error("Error verifying OTP:", error.response?.data || error.message);
@@ -58,20 +87,24 @@ const DriverDetailsForm = () => {
       alert("Session expired. Please login again.");
       return;
     }
-  
+
     if (!details.vehicleNumber || details.vehicleNumber.trim() === "") {
       alert("Vehicle Number is required.");
       return;
     }
-    
+
     try {
-      await axios.post("http://localhost:3000/api/v1/driver/details", details, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/driver/details`,
+        details,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       alert("Details Submitted!");
-      navigate("/home/driver"); // ✅ Navigate to driver homepage after success
+      navigate("/home"); // ✅ Navigate to home after success
     } catch (error) {
       console.error("Error submitting details:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Failed to submit details");
@@ -89,32 +122,42 @@ const DriverDetailsForm = () => {
             type="text"
             placeholder="Vehicle Owner Name"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, vehicleOwnerName: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, vehicleOwnerName: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Vehicle Number"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, vehicleNumber: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, vehicleNumber: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Driver Name"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, driverName: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, driverName: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Driver Phone Number"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, driverPhoneNumber: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, driverPhoneNumber: e.target.value })
+            }
           />
           {otpSent && (
             <input
               type="text"
               placeholder="OTP"
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-              onChange={(e) => setDetails({ ...details, otp: e.target.value })}
+              onChange={(e) =>
+                setDetails({ ...details, otp: e.target.value })
+              }
             />
           )}
           <button
@@ -128,19 +171,25 @@ const DriverDetailsForm = () => {
             type="text"
             placeholder="Driver License Number"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, driverLicenseNumber: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, driverLicenseNumber: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Vehicle Type"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, vehicleType: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, vehicleType: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Travel Permit"
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            onChange={(e) => setDetails({ ...details, travelPermit: e.target.value })}
+            onChange={(e) =>
+              setDetails({ ...details, travelPermit: e.target.value })
+            }
           />
           <button
             type="submit"

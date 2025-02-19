@@ -12,14 +12,14 @@ const Landing = () => {
         <div className="flex space-x-4">
           <button
             className="bg-transparent border border-white text-white py-2 px-4 rounded hover:bg-white hover:text-black transition"
-            onClick={() => navigate("/login/user")}
+            onClick={() => navigate("/user/login")}
           >
             User Login
           </button>
           <button
             className="bg-transparent border border-white text-white py-2 px-4 rounded hover:bg-white hover:text-black transition"
-            onClick={() => navigate("/login/driver")}
-          >
+            onClick={() => navigate("/driver/login")}
+          > 
             Driver Login
           </button>
         </div>

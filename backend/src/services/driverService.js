@@ -1,5 +1,5 @@
 import Driverdetails from "../models/driverDetails.js";
-import User from "../models/user.js";
+import Driver from "../models/drivermodel.js";
 import axios from "axios";
 import dotenv from "dotenv";
 import redisClient from "../config/redis.js";
@@ -65,11 +65,80 @@ export const isOtpVerified = async (phoneNumber) => {
   return verificationStatus === "true";
 };
 
-export const fillDriverDetails = async (userId, details) => {
-  const driverDetails = new Driverdetails({ userId, ...details });
-  await driverDetails.save();
+// export const fillDriverDetails = async (userId, details) => {
+//   const driverDetails = new Driverdetails({ userId, ...details });
+//   await driverDetails.save();
 
-  // Update the User to know that driver details are filled
-  await User.findByIdAndUpdate(userId, { isDriverDetailsFilled: true });
-  return driverDetails;
+//   // Update the User to know that driver details are filled
+//   await User.findByIdAndUpdate(userId, { isDriverDetailsFilled: true });
+//   return driverDetails;
+// };
+export const fillDriverDetails = async (userId, details) => {
+  try {
+    // Check if details already exist
+    const existingDetails = await Driverdetails.findOne({ userId });
+    if (existingDetails) {
+      throw new Error("Driver details already exist");
+    }
+
+    // Start a session for transaction
+    const session = await Driverdetails.startSession();
+    
+    try {
+      await session.withTransaction(async () => {
+        // Create driver details
+        const driverDetails = new Driverdetails({ 
+          userId, 
+          ...details 
+        });
+        await driverDetails.save({ session });
+
+        // Update driver status and details flag
+        await Driver.findByIdAndUpdate(
+          userId,
+          { 
+            isDriverDetailsFilled: true,
+            status: "active"
+          },
+          { session }
+        );
+      });
+
+      await session.endSession();
+
+      return {
+        success: true,
+        message: "Driver details saved successfully",
+        isProfileComplete: true
+      };
+    } catch (error) {
+      await session.endSession();
+      throw error;
+    }
+  } catch (error) {
+    throw new Error(`Failed to save driver details: ${error.message}`);
+  }
+};
+
+export const getDriverDetails = async (userId) => {
+  try {
+    const driverDetails = await Driverdetails.findOne({ userId });
+    const driver = await Driver.findById(userId).select('-password');
+
+    if (!driver) {
+      throw new Error("Driver not found");
+    }
+
+    return {
+      success: true,
+      data: {
+        driver,
+        details: driverDetails,
+        isProfileComplete: driver.isDriverDetailsFilled,
+        status: driver.status
+      }
+    };
+  } catch (error) {
+    throw new Error(`Failed to get driver details: ${error.message}`);
+  }
 };

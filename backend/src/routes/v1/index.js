@@ -1,14 +1,18 @@
 import express from 'express';
-import { signupController, loginController, cachedlogin } from '../../controllers/authcontroller.js';
+import { signupController, loginController,getCachedLoginController} from '../../controllers/authcontroller.js';
+import {driverLoginController,driverSignupController,getCachedDriverLoginController} from '../../controllers/driverauthcontroller.js'
 import { fillDriverDetailsController,sendOtpController,verifyOtpContrller } from '../../controllers/drivercontroller.js';
 import {createRide,confirmRide,startRide,endRide} from '../../controllers/bookingcontroller.js'
 import{getLocation,getdistime,getAutocompletesuggestions,captainInRadius} from '../../controllers/mapcontroller.js'
 import {authenticate} from '../../middlewares/authenticate.js';
 
 const router = express.Router();
-router.post("/signup", signupController);
-router.post("/login", loginController);
-router.get("/cachedlogin/:userId", cachedlogin); 
+router.post("/user/signup", signupController);
+router.post("/user/login", loginController);
+router.post("/driver/signup",driverSignupController);
+router.post("/driver/login",driverLoginController);
+router.get("/cachedlogin/:userId",getCachedLoginController); 
+router.get("/cachedlogin/:driverId",getCachedDriverLoginController);
 router.post("/driver/details/sendOtp", sendOtpController);
 router.post("/driver/details/verifyOtp", verifyOtpContrller);
 router.post("/driver/details",authenticate,fillDriverDetailsController);

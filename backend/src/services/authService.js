@@ -3,96 +3,60 @@ import bcrypt from "bcrypt";
 import redisClient from "../config/redis.js";
 import User from "../models/user.js";
 
-
-export const signup = async (name, email, password, role) => {
+export const signup = async (name, email, password) => {
   try {
-    // Check if the email already exists in the database
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new Error("Email is already registered.");
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedpassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Save data in the database
     const user = new User({
       name,
       email,
-      password: hashedpassword,
-      role,
+      password: hashedPassword,
     });
+
     await user.save();
 
-    // Generate the JWT and store it in Redis for fast response
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
     await redisClient.set(`session:${user._id}`, token, { EX: 86400 });
 
-    return {
-      message: "User registered successfully",
-      user,
-      token,
-      role: user.role,
-    };
+    return { message: "User registered successfully", user, token };
   } catch (error) {
     console.log("Error in signup function in authservice");
     throw error;
   }
 };
 
-export const login = async (email, password, role) => {
-  
+export const login = async (email, password) => {
   try {
-    console.log("Login attempt with:", { email, role }); // Debug log
-    if (!role) {
-      throw { message: "Role is required for login" };
-    }
     const user = await User.findOne({ email });
     if (!user) {
-      throw {
-        message: "No User found",
-      };
+      throw { message: "No User found" };
     }
 
-    // Check if the role matches
-    if (user.role !== role) {
-      throw {
-        message: `Invalid role. This email is registered as a ${user.role}.`,
-      };
+    const comparePassword = await bcrypt.compare(password, user.password);
+    if (!comparePassword) {
+      throw { message: "Password is incorrect" };
     }
 
-    const comparepassword = await bcrypt.compare(password, user.password);
-    if (!comparepassword) {
-      throw {
-        message: "Password is incorrect",
-      };
+    const cachedToken = await redisClient.get(`session:${user._id}`);
+    if (cachedToken) {
+      return { token: cachedToken, user, message: "Logged in using cached token" };
     }
 
-    // Now check Redis for this existing token
-    const cachedtoken = await redisClient.get(`session:${user._id}`);
-    if (cachedtoken) {
-      return {
-        token: cachedtoken,
-        user,
-        role: user.role,
-        message: "Logged in using cached token",
-      };
-    }
-
-    // Generate a new JWT token and store it
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+
     await redisClient.set(`session:${user._id}`, token, { EX: 86400 });
 
-    return {
-      token,
-      role: user.role,
-      user,
-      message: "Logged in successfully",
-    };
+    return { token, user, message: "Logged in successfully" };
   } catch (error) {
     console.log("Error in authservice login");
     throw error;

@@ -1,27 +1,33 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Landing from './pages/landingpage/landingpage';
-import { AuthProvider } from './context/authcontext';
-import Login from './pages/login/login';
-import Signup from './pages/signup/signup';
-import DriverDetailsForm from './components/DriverDetailForms';
-import DriverHome from './pages/home/driverhome';
-import UserHome from './pages/home/userhome';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Landing from "./pages/landing/landingpage";
+import UserLogin from "./pages/login/Userlogin";
+import UserSignup from "./pages/signup/UserSignup";
+import CaptainSignup from "./pages/signup/DriverSignup";
+import CaptainLogin from "./pages/login/CaptainLogin";
+import DriverDetailsForm from "./components/Driverdetailsform";
+import UserContext from "./context/UserContext"; // Ensure correct path
+import CaptainContext from "./context/CaptainContext";
 
 const App = () => {
-    return (
-        <AuthProvider>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/login/:role" element={<Login />} />
-                    <Route path="/signup/:role" element={<Signup />} />
-                    <Route path="/driver/details" element={<DriverDetailsForm />} />
-                    <Route path="/home/user" element={<UserHome />} />
-                    <Route path="/home/driver" element={<DriverHome />} />
-                </Routes>
-            </Router>
-        </AuthProvider>
-    );
+  return (
+    <CaptainContext>
+<UserContext>  {/* Wrap the whole app in UserContext */}
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path='/user/login' element={<UserLogin />} />
+          <Route path='/user/signup' element={<UserSignup />} />
+          <Route path='/driver/signup' element={<CaptainSignup />} />
+          <Route path='/driver/login' element={<CaptainLogin/>} />
+          <Route path='/driverdetails' element={<DriverDetailsForm/>} />
+
+
+        </Routes>
+      </Router>
+    </UserContext>
+    </CaptainContext>
+    
+  );
 };
 
 export default App;

@@ -1,83 +1,84 @@
+
 import { signup, login, GetCachedLogin } from "../services/authService.js";
 
-// Signup
+
 export const signupController = async (req, res) => {
   try {
-    const { name, email, password,role } = req.body;
-    const result = await signup(name, email, password, role);
-    return res.status(200).json({
-      success: true,
-      message: "User successfully registered",
-      data: result,
-      err: {},
-    });
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ success: false,
+           message: "All fields are required" 
+          });
+    }
+
+    const result = await signup(name, email, password);
+    return res.status(201).json({ 
+      success: true, 
+      ...result
+     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Something went wrong in signup fn in auth-controller",
-      data: {},
-      success: false,
-      err: error,
-    });
+    console.error("Signup error:", error.message);
+    return res.status(500).json({ 
+      success: false, 
+      message: error.message
+     });
   }
 };
 
-// Login
+
 export const loginController = async (req, res) => {
   try {
-    const { email, password,role } = req.body;
-    // const { email, password } = req.body;
-    const {token,role:userRole,user} = await login(email, password,role);
-    if (userRole === "driver" && !user.isDriverDetailsFilled) {
-      return res.status(200).json({
-        success: true,
-        message: "Driver must fill details",
-        data: {
-          token,
-          role,
-          user: { ...user, isDriverDetailsFilled: false }
-        }
-      });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ 
+          success: false, 
+          message: "Email and password are required"
+         });
     }
-    return res.status(200).json({
+
+    const result = await login(email, password);
+    return res.status(200).json({ 
       success: true,
-      message: "Successfully logged in",
-      data: {token,role,user},
-      err: {},
-    });
+       ...result
+       });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Something went wrong in login fn in auth-controller",
-      data: {},
-      success: false,
-      err: error,
-    });
+    console.error("Login error:", error.message);
+    return res.status(401).json({
+       success: false, message: error.message 
+      });
   }
 };
 
-// Cached login
-export const cachedlogin = async (req, res) => { // Updated function name
+export const getCachedLoginController = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const cachedLogin = await GetCachedLogin(userId);
-    if (cachedLogin) {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ 
+          success: false, 
+          message: "User ID is required" 
+        });
+    }
+
+    const result = await GetCachedLogin(userId);
+    if (result) {
       return res.status(200).json({
-        success: true,
-        message: "Successfully logged in using cached token",
-        data: cachedLogin,
-        err: {},
-      });
+         success: true, ...result 
+        });
     } else {
-      return res.status(404).json({ message: "No cached login found" });
+      return res
+        .status(404)
+        .json({ 
+          success: false, message: "No cached session found"
+         });
     }
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Something went wrong in cached login fn in auth-controller",
-      data: {},
-      success: false,
-      err: error,
-    });
+    console.error("Error fetching cached login:", error.message);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

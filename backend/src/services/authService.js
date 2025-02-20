@@ -69,3 +69,30 @@ export const GetCachedLogin=async(userId)=>{
  return cachedtoken ?{token:cachedtoken}:null;
 
 };
+
+
+export const getUserProfile = async (userId) => {
+  try {
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return { user };
+  } catch (error) {
+    console.log("Error in getUserProfile function in authservice", error);
+    throw error;
+  }
+};
+
+/**
+ * Logs out a user by deleting the session token from Redis.
+ */
+export const logout = async (userId) => {
+  try {
+    await redisClient.del(`session:${userId}`);
+    return { message: "User logged out successfully" };
+  } catch (error) {
+    console.log("Error in logout function in authservice", error);
+    throw error;
+  }
+};

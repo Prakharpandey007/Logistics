@@ -1,5 +1,5 @@
 
-import { signup, login, GetCachedLogin } from "../services/authService.js";
+import { signup, login, GetCachedLogin,getUserProfile,logout } from "../services/authService.js";
 
 
 export const signupController = async (req, res) => {
@@ -82,3 +82,35 @@ export const getCachedLoginController = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getUserProfileController = async (req, res) => {
+  try {
+    const userId = req.params.userId || req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
+    const result = await getUserProfile(userId);
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    console.error("Error fetching user profile:", error.message);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const logoutController = async (req, res) => {
+  try {
+    const userId = req.params.userId || req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
+    const result = await logout(userId);
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    console.error("Error logging out:", error.message);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+

@@ -110,10 +110,11 @@ export const getDriverProfileController = async (req, res) => {
  */
 export const logoutDriverController = async (req, res) => {
   try {
-    const driverId = req.params.driverId || req.query.driverId;
-    if (!driverId) {
-      return res.status(400).json({ success: false, message: "Driver ID is required." });
-    }
+    const driverId = req.query.driverId || req.params.driverId;
+if (!driverId) {
+    return res.status(400).json({ success: false, message: "Driver ID is required." });
+}
+
     const result = await logoutDriver(driverId);
     return res.status(200).json({
       success: true,

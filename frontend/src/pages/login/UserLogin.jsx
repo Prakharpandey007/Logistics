@@ -24,7 +24,7 @@ const UserLogin = () => {
         const data = response.data;
         setUser(data.user);
         localStorage.setItem("token", data.token);
-        navigate("/home"); // Redirect to home after login
+        navigate("/user/home"); // Redirect to home after login
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -37,7 +37,7 @@ const UserLogin = () => {
   return (
     <div className="h-screen flex items-center justify-center bg-gray-900 bg-opacity-50">
       <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-96 backdrop-blur-md">
-        <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">User Login</h2>
         <form onSubmit={submitHandler}>
           <label className="block text-gray-700 font-medium">Email</label>
           <input

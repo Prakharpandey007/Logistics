@@ -7,6 +7,12 @@ import CaptainLogin from "./pages/login/CaptainLogin";
 import DriverDetailsForm from "./components/Driverdetailsform";
 import UserContext from "./context/UserContext"; // Ensure correct path
 import CaptainContext from "./context/CaptainContext";
+import UserProtectWrapper from "./pages/UserprotectedWrapper";
+import CaptainProtectWrapper from "./pages/Captainproctedwrapper";
+import Userhome from "./pages/Home/userhome";
+import Captainhome from "./pages/Home/captainhome";
+import UserLogout from "./pages/Logout/Userlogout";
+import CaptainLogout from "./pages/Logout/CaptainLogout";
 
 const App = () => {
   return (
@@ -20,7 +26,32 @@ const App = () => {
           <Route path='/driver/signup' element={<CaptainSignup />} />
           <Route path='/driver/login' element={<CaptainLogin/>} />
           <Route path='/driverdetails' element={<DriverDetailsForm/>} />
+          <Route
+              path="/user/home"
+              element={
+                <UserProtectWrapper>
+                  <Userhome/>
+                </UserProtectWrapper>
+              }
+            />
 
+            <Route
+              path="/driver/home"
+              element={
+                <CaptainProtectWrapper>  {/* Use correct wrapper */}
+                <Captainhome/>
+                </CaptainProtectWrapper>
+              }
+            />
+            <Route
+              path="/user/logout"
+              element={
+                <UserProtectWrapper>
+                  <UserLogout/>
+                </UserProtectWrapper>
+              }
+            />
+             <Route path='/driver/logout' element={<CaptainLogout/>} />
 
         </Routes>
       </Router>

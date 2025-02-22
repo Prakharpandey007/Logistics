@@ -39,7 +39,7 @@ const CaptainSignup = () => {
   return (
     <div className="h-screen flex items-center justify-center bg-gray-900 bg-opacity-50">
       <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-96 backdrop-blur-md">
-        <h2 className="text-2xl font-semibold text-center mb-6">Sign Up</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">Captain Sign Up</h2>
         <form onSubmit={submitHandler}>
           <label className="block text-gray-700 font-medium">Full Name</label>
           <input

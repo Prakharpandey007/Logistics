@@ -38,7 +38,7 @@ const CaptainLogin = () => {
         if (!driver.isDriverDetailsFilled) {
           navigate("/driverdetails");
         } else {
-          navigate("/home");
+          navigate("/driver/home");
         }
       }
     } catch (error) {

@@ -2,7 +2,7 @@ import express from 'express';
 import { signupController, loginController,getCachedLoginController,getUserProfileController,logoutController} from '../../controllers/authcontroller.js';
 import {driverLoginController,driverSignupController,getCachedDriverLoginController,getDriverProfileController,logoutDriverController} from '../../controllers/driverauthcontroller.js'
 import { fillDriverDetailsController,sendOtpController,verifyOtpContrller } from '../../controllers/drivercontroller.js';
-import {createRide,confirmRide,startRide,endRide} from '../../controllers/bookingcontroller.js'
+import {createRide,confirmRide,startRide,endRide,getFareController} from '../../controllers/bookingcontroller.js'
 import{getLocation,getdistime,getAutocompletesuggestions,captainInRadius} from '../../controllers/mapcontroller.js'
 import {authenticate} from '../../middlewares/authenticate.js';
 
@@ -30,8 +30,10 @@ router.post("/bookings/createbooking", authenticate, createRide);
 router.post("/bookings/confirmbooking", authenticate, confirmRide);
 router.post("/bookings/startbooking", authenticate, startRide);
 router.post("/bookings/endbooking", authenticate, endRide);
-router.get("/user/geolocation",authenticate,getLocation);
-router.get('/user/distime',authenticate,getdistime);
-router.get('/user/autosuggestions',authenticate,getAutocompletesuggestions);
-router.get('/user/captaininradius',authenticate,captainInRadius);
+router.get('/bookings/getfare',authenticate,getFareController);
+router.get("/map/geolocation",authenticate,getLocation);
+router.get('/map/distime',authenticate,getdistime);
+
+router.get('/map/autosuggestions',authenticate,getAutocompletesuggestions);
+router.get('/map/captaininradius',authenticate,captainInRadius);
 export default router;

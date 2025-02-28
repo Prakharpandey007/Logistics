@@ -22,6 +22,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
+app.use(express.static("public"));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
